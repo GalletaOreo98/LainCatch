@@ -1,6 +1,11 @@
+body {
+    background: #0F0F0F;
+}
+
 #gameCanvas {
     display: block;
     margin: auto;
+    border: solid 5px #7e1c1c;
 }
 
 #replayButton {

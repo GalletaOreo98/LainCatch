@@ -26,15 +26,19 @@ let catchAreaY = canvas.height - catchAreaHeight;
 // Crea un array para almacenar los elementos que caen
 let fallingElements = [];
 
-// Algunos parametros 
+// Algunos parametros iniciales
 let score = 0;
 let gameOver = false;
 let lastElementTime = 0;
-let canvasBackgroundColor = 'lightblue';
-let catchAreaColor = 'purple';
-let canvasTextColor = 'black';
-let canvasTextShadowColor = 'white';
+let fallingElementRateGeneration = 500;
+let extraSpeed = 0;
 
+// Parametros de colores
+let canvasBackgroundColor = '#F8EEE7';
+let catchAreaColor = '#94618E';
+let canvasTextColor = '#49274A';
+let canvasTextShadowColor = '#94618E';
+let canvasGameOverTextColor = '#49274A';
 
 // Función para dibujar el fondo del juego
 function drawBackground() {
@@ -46,6 +50,11 @@ function drawBackground() {
 function drawCatchArea() {
     ctx.fillStyle = catchAreaColor;
     ctx.fillRect(catchAreaX, catchAreaY, catchAreaWidth, catchAreaHeight);
+
+    // VER AREA DE COLISION
+    // ctx.strokeStyle = 'red';
+    // ctx.lineWidth = 2;
+    // ctx.strokeRect(catchAreaX, catchAreaY, catchAreaWidth, catchAreaHeight);
 }
 
 // Función para generar un elemento aleatorio
@@ -53,7 +62,7 @@ function generateRandomElement() {
 
     const currentTime = performance.now();
 
-    if (currentTime - lastElementTime < 500) {
+    if (currentTime - lastElementTime < fallingElementRateGeneration) {
         return;
     }
 
@@ -77,7 +86,7 @@ function generateRandomElement() {
     const y = 0;
 
     // Generar una velocidad aleatoria
-    const speed = Math.random() * 5 + 1;
+    const speed = Math.random() * 5 + 1 + extraSpeed;
 
     // Crear un objeto elemento con estos valores
     const element = { image, x, y, speed };
@@ -97,6 +106,11 @@ function drawFallingElements() {
         // Dibujar la imagen del elemento
         ctx.drawImage(element.image, element.x, element.y);
 
+        // VER AREAS DE COLISION
+        // ctx.strokeStyle = 'red';
+        // ctx.lineWidth = 2;
+        // ctx.strokeRect(element.x, element.y, element.image.width, element.image.height);
+
         // Actualizar la posición del elemento en función de su velocidad
         element.y += element.speed;
 
@@ -112,10 +126,24 @@ function drawFallingElements() {
 // Función para comprobar si un elemento ha sido atrapado
 function checkCollision(element) {
     // Comprobar si las coordenadas del elemento están dentro del área de atrapado
-    if (element.x > catchAreaX && element.x < catchAreaX + catchAreaWidth && element.y > catchAreaY && element.y < catchAreaY + catchAreaHeight) {
+     
+    const disminution = 50; // Es para disminuir el area de colision del objeto que atrapa
+    if (element.x < catchAreaX + catchAreaWidth && 
+        element.x + catchAreaWidth > catchAreaX && 
+        element.y < catchAreaY + catchAreaHeight + disminution && 
+        element.image.height + element.y > catchAreaY + disminution) {
         return true;
     }
     return false;
+
+    // OTRA FORMA
+    // if (element.x > catchAreaX && 
+    //     element.x < catchAreaX + catchAreaWidth && 
+    //     element.y > catchAreaY && 
+    //     element.y < catchAreaY + catchAreaHeight) {
+    //     return true;
+    // }
+    // return false;
 }
 
 // Función para actualizar la puntuación y gestionar el fin del juego
@@ -129,6 +157,10 @@ function updateScore() {
             score++;
             fallingElements.splice(i, 1);
             i--;
+            if (score % 10 == 0) {
+                extraSpeed += 0.5;
+                fallingElementRateGeneration -= 20;
+            } 
         }
     }
 }
@@ -147,7 +179,12 @@ function update() {
     // Si el juego ha terminado, mostrar un mensaje y detener el bucle
     if (gameOver) {
         ctx.font = '48px sans-serif';
-        ctx.fillText('Game Over!', canvas.width / 2 - 150, canvas.height / 2);
+
+        ctx.fillStyle = canvasTextShadowColor;
+        ctx.fillText('Game Over!', canvas.width / 2 - 149 + 20, canvas.height / 2 + 1);
+
+        ctx.fillStyle = canvasGameOverTextColor;
+        ctx.fillText('Game Over!', canvas.width / 2 - 150 + 20, canvas.height / 2);
         return;
     }
 
@@ -157,9 +194,16 @@ function update() {
 
     // Dibujar y actualizar los elementos que caen
     drawFallingElements();
+
     // Mostrar la puntuación en la parte superior del canvas
     ctx.font = '24px sans-serif';
+
+    ctx.fillStyle = canvasTextShadowColor;
+    ctx.fillText(`Score: ${score}`, 9, 31);
+
+    ctx.fillStyle = canvasTextColor;
     ctx.fillText(`Score: ${score}`, 10, 30);
+    
 
     // Llamar a la función update en el próximo frame
     requestAnimationFrame(update);
@@ -205,6 +249,8 @@ canvas.addEventListener('touchmove', event => {
 replayButton.addEventListener('click', function() {
     // Reiniciar el juego
     score = 0;
+    extraSpeed = 0;
+    fallingElementRateGeneration = 500;
     gameOver = false;
     fallingElements = [];
     replayButton.style.display = 'none';
