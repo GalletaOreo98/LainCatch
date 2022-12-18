@@ -212,6 +212,8 @@ function update() {
 // Iniciar el bucle de juego
 update();
 
+// JUST A LITTLE MESSAGE FOR U: GOD IS WATCHING U
+console.log("No hagas trampa por favor, Lain no estaría orgullosa de ti");
 
 // Escuchar el evento mousemove y actualizar la posición del área de atrapado en función de la posición del cursor
 canvas.addEventListener('mousemove', event => {
@@ -256,6 +258,3 @@ replayButton.addEventListener('click', function() {
     replayButton.style.display = 'none';
     update();
 });
-  
-
-
