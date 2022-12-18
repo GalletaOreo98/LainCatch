@@ -1,0 +1,11 @@
+#gameCanvas {
+    display: block;
+    margin: auto;
+}
+
+#replayButton {
+    display: none;
+    margin: auto;
+    margin-top: 5px;
+}
+  
